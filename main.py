@@ -9,6 +9,9 @@ from sprites import *
 from tilemap import *
 from menu import *
 import menu
+from methods import *
+
+statsFileName = "story/stats.txt"
 
 class Game:
     def __init__(self):
@@ -26,23 +29,29 @@ class Game:
     def load_data(self):
         game_folder = path.dirname(__file__)
         graphics_folder = path.join(game_folder, 'graphics')
-        self.map = Map(path.join(game_folder, 'maps/map.txt'))
+        map_folder = path.join(game_folder, "maps")
+        self.map = TiledMap(path.join(map_folder, 'mapa.tmx'))
+        self.map_img = self.map.make_map()
+        self.map_rect = self.map_img.get_rect()
         self.player_img = pg.image.load(path.join(graphics_folder, PLAYER_IMG)).convert_alpha()
-        #self.mob_img = pg.image.load(path.join(graphics_folder, MOB_IMG)).convert_alpha()
+        self.mob_img = pg.image.load(path.join(graphics_folder, MOB_IMG)).convert_alpha()
 
-    def new(self):
+    def new(self, player_position_x, player_position_y):
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
-        #self.mobs = pg.sprite.Group()
-        for row, tiles in enumerate(self.map.data):
-            for col, tile in enumerate(tiles):
-                if tile == 'P':
-                    self.player = Player(self, col, row)
-                if tile == '1':
-                    Wall(self, col, row)
+        self.mobs = pg.sprite.Group()
+        #for row, tiles in enumerate(self.map.data):
+            #for col, tile in enumerate(tiles):
+                #if tile == 'P':
+                    #self.player = Player(self, col, row)
+                #if tile == '1':
+                    #Wall(self, col, row)
                 #if tile == '2':
                     #Mob(self, col, row)
+
+        self.player = Player(self, player_position_x / TILESIZE, player_position_y / TILESIZE)
         self.camera = Camera(self.map.width, self.map.height, 0, 0)
+
 
     def run(self):
         self.playing = True
@@ -51,6 +60,7 @@ class Game:
             self.events()
             self.update()
             self.draw()
+            pg.display.flip()
 
     def quit(self):
         pg.quit()
@@ -85,7 +95,8 @@ class Game:
 
     def draw(self):
         pg.display.set_caption("{:.2f}".format(self.clock.get_fps()))
-        self.screen.fill(BGCOLOR)
+        #self.screen.fill(BGCOLOR)
+        self.screen.blit(self.map_img, self.camera.apply_rect(self.map_rect))
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
 
@@ -95,6 +106,7 @@ class Game:
                 self.quit()
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
+                    ChangePlayerPosition(self.player.pos.x, self.player.pos.y)
                     m = menu.Menu()
                 if event.key == pg.K_KP_ENTER:
                     print(self.camera.x)
@@ -109,17 +121,8 @@ class Game:
         self.player.image = pg.transform.rotate(self.player_img, angle)
         self.rect = self.player.image.get_rect(center = self.player.rect.center)
 
-        pg.display.flip()
-
     def show_start_screen(self):
         pass
 
     def show_go_screen(self):
         pass
-
-#g = Game()
-#g.show_start_screen()
-#while True:
-   # g.new()
-   # g.run()
-  #  g.show_go_screen()

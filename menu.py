@@ -14,7 +14,7 @@ from settings import *
 from methods import *
 # Setup pygame/window ---------------------------------------- #
 
-statsFile = open("story/stats.txt", "r+")
+statsFileName = "story/stats.txt"
 
 class Menu:
 
@@ -30,8 +30,6 @@ class Menu:
         blue = (0, 0, 128)
         pygame.font.init()
         myfont = pygame.font.SysFont('calibri', 30)
-
-        #start = json.loads(star)
 
         font = pygame.font.SysFont(None, 20)
 
@@ -136,22 +134,18 @@ class Menu:
 
         def StartGame():
             g = m.Game()
+
+            statsFile = open(statsFileName, "r+")
+            actualStats = json.loads(statsFile.read())
+            x = actualStats["player_position"]["x"]
+            y = actualStats["player_position"]["y"]
+
             while True:
-                g.new()
+                g.new(x, y)
                 g.run()
-            
-                for event in pygame.event.get():
-                    if event.type == QUIT:
-                        pygame.quit()
-                        sys.exit()
-                    if event.type == KEYDOWN:
-                        if event.key == K_ESCAPE:
-                            running = False
-                
-                pygame.display.update()
-                mainClock.tick(60)
 
         def NewGame():
+            statsFile = open(statsFileName, "r+")
             actualStats = json.loads(statsFile.read())
 
             if (not StringToBool(actualStats["start"])):
@@ -170,6 +164,7 @@ class Menu:
                     break
                 StartGame()
             else:
+                statsFile.close()
                 StartGame()
 
         def quit():

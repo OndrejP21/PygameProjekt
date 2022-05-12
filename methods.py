@@ -2,6 +2,7 @@ from base64 import decode
 from tokenize import Number, String
 import pygame as pg
 import time
+import json
 from settings import *
 import codecs
 
@@ -10,6 +11,17 @@ def StringToBool(stringBool):
         return True
     else:
         return False
+
+def ChangePlayerPosition(x, y):
+    statsFileName = "story/stats.txt"
+    statsFile = open(statsFileName, "r+")
+    actualStats = json.loads(statsFile.read())
+
+    actualStats["player_position"] = {"x": x, "y": y}
+    statsFile.seek(0)
+    statsFile.write(str(actualStats).replace("'", "\""))
+    statsFile.truncate()
+    statsFile.close()
 
 transfer = 2.5373932
 

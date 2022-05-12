@@ -1,1 +1,1 @@
-{"start": "true"}
+{"start": "true", "player_position": {"x": 698.6474599999999, "y": 1001.6474600000005}}
